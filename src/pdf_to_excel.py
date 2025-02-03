@@ -1,15 +1,13 @@
 import pymupdf4llm
-from langchain_community.document_loaders import PyPDFLoader
 import pandas as pd
 from fuzzywuzzy import fuzz
 
 def extract_pdf_data(pdf_path):
     try:
     # 표 데이터 추출 (pymupdf4llm 사용)
-        table_content = pymupdf4llm.to_markdown(pdf_path)
+        table_content = pymupdf4llm.to_markdown(pdf_path, write_images=True)
         print('table_content', table_content)
         
-
         # 마크다운 테이블을 파싱하여 필요한 데이터만 추출
         extracted_data = []
         
