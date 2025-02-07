@@ -2,13 +2,9 @@ import pymupdf4llm
 import pandas as pd
 from fuzzywuzzy import fuzz
 
-def extract_pdf_data(pdf_path):
+def extract_pdf_data(pdf_path, item_col_idx, result_col_idx):
     try:
-    # 표 데이터 추출 (pymupdf4llm 사용)
-        table_content = pymupdf4llm.to_markdown(pdf_path, write_images=True)
-        print('table_content', table_content)
-        
-        # 마크다운 테이블을 파싱하여 필요한 데이터만 추출
+        table_content = pymupdf4llm.to_markdown(pdf_path)
         extracted_data = []
         
         # 테이블 문자열을 줄 단위로 분리
@@ -22,10 +18,10 @@ def extract_pdf_data(pdf_path):
                 # 빈 문자열 제거
                 columns = [col for col in columns if col]
                 
-                if len(columns) >= 3:  # 최소 3개 열이 있는지 확인
-                    # 검사항목(1열)과 검사결과값(3열)만 추출
-                    item = columns[0]
-                    result = columns[-1]
+                if len(columns) > max(item_col_idx, result_col_idx):  # 필요한 열이 있는지 확인
+                    # 지정된 인덱스의 검사항목과 검사결과값 추출
+                    item = columns[item_col_idx]
+                    result = columns[result_col_idx]
                     extracted_data.append({
                         "검사항목": item,
                         "검사결과": result
