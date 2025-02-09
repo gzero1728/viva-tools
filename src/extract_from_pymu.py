@@ -1,9 +1,21 @@
 from langchain_community.document_loaders import PyMuPDFLoader
+import pdfplumber
+import pandas as pd
+import openpyxl
 
 def extract_from_pymu(pdf_path):
     loader = PyMuPDFLoader(pdf_path)
     documents = loader.load()
     return documents
+
+def extract_from_pdfplumber(pdf_path):
+    with pdfplumber.open(pdf_path) as pdf:
+        third_page = pdf.pages[2]
+        tables = third_page.extract_tables()
+        
+    df = pd.DataFrame(tables[1][1:])
+    # df.to_excel("sample.xlsx", index=False)
+    return df.set_index(0)[1].to_dict()
 
 def format_pymu_data(pdf_path, column_count, item_col_idx, result_col_idx):
     """
