@@ -88,6 +88,87 @@ def extract_from_pdfplumber(pdf_path, item_col_idx=0, result_col_idx=1):
 
     return results
 
+def extract_from_pdfplumber2(pdf_path, item_col_name="검사항목", result_col_name="검사결과"):
+    """
+    PDF 테이블 데이터를 파싱하여 검사항목과 결과를 매핑한 리스트를 반환합니다.
+    
+    Args:
+        pdf_path: PDF 파일 경로
+        item_col_name: 검사항목 컬럼의 이름 (기본값: "검사항목")
+        result_col_name: 검사결과 컬럼의 이름 (기본값: "검사결과")
+    
+    Returns:
+        List[Dict]: 검사항목과 결과가 매핑된 딕셔너리 리스트
+    """
+    results = []
+    
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            tables = page.extract_tables()
+            
+            for table in tables:
+                if not table:
+                    continue
+                
+                # 헤더 행과 인덱스 찾기
+                header_row_idx = None
+                item_col_idx = None
+                result_col_idx = None
+                
+                for row_idx, row in enumerate(table):
+                    if not row:
+                        continue
+                    
+                     # 중복 문자 제거
+                    filtered_row = [
+                        remove_duplicated_chars(col.strip()) if col else ""
+                        for col in row
+                    ]
+
+                    print("filtered_row", filtered_row)
+                    # 현재 행에서 컬럼 이름 찾기
+                    try:
+                        item_idx = filtered_row.index(item_col_name)
+                        result_idx = filtered_row.index(result_col_name)
+                        header_row_idx = row_idx
+                        item_col_idx = item_idx
+                        result_col_idx = result_idx
+                        break
+                    except ValueError:
+                        continue
+                
+                # 헤더를 찾지 못한 경우 다음 테이블로
+                if header_row_idx is None:
+                    continue
+                
+                # 헤더 이후의 데이터 행 처리
+                for row in table[header_row_idx + 1:]:
+                    # None 값을 필터링한 새로운 row 생성
+                    filtered_row = [col for col in row if col is not None]
+                    
+                    # 필터링된 row의 길이가 부족한 경우 빈 문자열로 확장
+                    max_idx = max(item_col_idx, result_col_idx)
+                    while len(filtered_row) <= max_idx:
+                        filtered_row.append("")
+                    
+                    item = filtered_row[item_col_idx].strip() if filtered_row[item_col_idx] else ""
+                    result = filtered_row[result_col_idx].strip() if filtered_row[result_col_idx] else ""
+
+                    # 한글 중복 문자 제거
+                    item = remove_duplicated_chars(item)
+                    result = remove_duplicated_chars(result)
+                    
+                    if item or result:  # 둘 중 하나라도 값이 있으면 추가
+                        results.append({
+                            item_col_name: item,
+                            result_col_name: result
+                        })
+    df = pd.DataFrame(results)
+    output_path = pdf_path.rsplit('.', 1)[0] + '_results2.xlsx'
+    df.to_excel(output_path, index=False)
+
+    return results
+
 def format_pymu_data(pdf_path, column_count, item_col_idx, result_col_idx):
     """
     PDF 테이블 데이터를 파싱하여 검사항목과 결과를 매핑한 리스트를 반환합니다.
