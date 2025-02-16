@@ -1,5 +1,4 @@
 import { useState } from "react";
-import axios from "axios";
 import {
   Button,
   Container,
@@ -9,6 +8,7 @@ import {
   Box,
   TextField,
 } from "@mui/material";
+import api from "./lib/axios";
 
 interface ExcelFile {
   content: string;
@@ -69,7 +69,7 @@ function App() {
 
     setLoading(true);
     try {
-      const response = await axios.post<ApiResponse>("/api/extract", formData);
+      const response = await api.post<ApiResponse>("/extract", formData);
       setResult(response.data);
 
       if (response.data.success && response.data.excel_file) {
