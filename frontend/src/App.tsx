@@ -94,7 +94,7 @@ function App() {
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>
-          검진결과 PDF 데이터 추출
+          검진결과PDF 데이터 추출
         </Typography>
 
         <Box sx={{ mb: 3 }}>
