@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.config import settings
-from api.routes import pdf
+from .core.config import settings
+from .api.routes import pdf
 
 # 업로드 디렉토리 생성
 settings.UPLOAD_DIR.mkdir(exist_ok=True)
