@@ -57,7 +57,7 @@ poetry install
 poetry shell
 
 # 개발 서버 실행
-python src/main.py
+poetry run dev
 ```
 
 서버는 http://localhost:8000 에서 실행됩니다.

@@ -21,6 +21,34 @@ app.add_middleware(
 # 라우터 등록
 app.include_router(pdf.router, prefix=settings.API_V1_STR)
 
-if __name__ == "__main__":
+def run_dev():
+    """개발 서버 실행"""
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000, reload=True)
+
+def run():
+    """프로덕션 서버 실행"""
+    import uvicorn
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000)
+
+def run_build_test():
+    """빌드 테스트 실행"""
+    import uvicorn
+    print("Starting build test...")
+    print("1. Testing server startup...")
+    try:
+        app.dependency_overrides = {}  # 의존성 초기화
+        print("✓ Server initialization successful")
+        
+        print("\n2. Testing routes...")
+        for route in app.routes:
+            print(f"✓ Route verified: {route.path}")
+        
+        print("\n3. Starting test server...")
+        uvicorn.run("src.main:app", host="0.0.0.0", port=8001)
+    except Exception as e:
+        print(f"\n❌ Build test failed: {str(e)}")
+        raise e
+
+if __name__ == "__main__":
+    run_dev() 

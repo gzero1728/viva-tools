@@ -1,8 +1,8 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from fastapi.responses import JSONResponse
 
-from ...services.pdf_service import PDFService
-from ..schemas.pdf import PDFResponse
+from src.services.pdf_service import PDFService
+from src.api.schemas.pdf import PDFResponse
 
 router = APIRouter()
 

@@ -3,6 +3,12 @@ name = "viva-tools-backend"
 version = "0.1.0"
 description = "PDF data extraction backend service"
 authors = ["Your Name <your.email@example.com>"]
+packages = [{include = "src"}]
+
+[tool.poetry.scripts]
+dev = "src.main:run_dev"
+start = "src.main:run"
+build-test = "src.main:run_build_test"
 
 [tool.poetry.dependencies]
 python = "^3.9"

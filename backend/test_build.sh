@@ -1,13 +1,15 @@
 #!/bin/bash
 
-echo "Creating virtual environment..."
-python -m venv .venv
-
-echo "Activating virtual environment..."
-source .venv/bin/activate
+echo "Installing poetry if not exists..."
+if ! command -v poetry &> /dev/null; then
+    curl -sSL https://install.python-poetry.org | python3 -
+fi
 
 echo "Installing dependencies..."
-pip install -r requirements.txt
+poetry install
 
-echo "Testing the application..."
-PYTHONPATH=$PYTHONPATH:. uvicorn src.main:app --host 0.0.0.0 --port 8000 
+echo "Building package..."
+poetry build
+
+echo "Running build tests..."
+poetry run build-test 
