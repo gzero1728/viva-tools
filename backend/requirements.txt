@@ -1,0 +1,5 @@
+fastapi==0.104.1
+python-multipart
+uvicorn
+pydantic
+python-dotenv
