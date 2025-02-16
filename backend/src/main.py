@@ -16,6 +16,8 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],  # 클라이언트에서 접근 가능한 헤더
+    max_age=600,  # 프리플라이트 요청 캐시 시간 (초)
 )
 
 # 라우터 등록
