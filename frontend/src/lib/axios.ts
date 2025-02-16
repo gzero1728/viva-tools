@@ -6,9 +6,6 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 // axios 인스턴스 생성 및 설정
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // 요청 인터셉터
