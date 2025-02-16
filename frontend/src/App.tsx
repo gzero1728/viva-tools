@@ -10,15 +10,53 @@ import {
   TextField,
 } from "@mui/material";
 
-function App() {
-  const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [itemColIdx, setItemColIdx] = useState(1);
-  const [resultColIdx, setResultColIdx] = useState(2);
+interface ExcelFile {
+  content: string;
+  filename: string;
+}
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+interface ApiResponse {
+  success: boolean;
+  data?: any;
+  error?: string;
+  excel_file?: ExcelFile;
+}
+
+function App() {
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<ApiResponse | null>(null);
+  const [itemColIdx, setItemColIdx] = useState<number>(1);
+  const [resultColIdx, setResultColIdx] = useState<number>(2);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setFile(event.target.files[0]);
+    }
+  };
+
+  const base64ToBlob = (
+    base64: string,
+    type: string = "application/octet-stream"
+  ): Blob => {
+    const binStr = atob(base64);
+    const len = binStr.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      arr[i] = binStr.charCodeAt(i);
+    }
+    return new Blob([arr], { type });
+  };
+
+  const downloadBlob = (blob: Blob, filename: string): void => {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleSubmit = async () => {
@@ -26,15 +64,14 @@ function App() {
 
     const formData = new FormData();
     formData.append("pdf_file", file);
-    formData.append("item_col_idx", itemColIdx);
-    formData.append("result_col_idx", resultColIdx);
+    formData.append("item_col_idx", itemColIdx.toString());
+    formData.append("result_col_idx", resultColIdx.toString());
 
     setLoading(true);
     try {
-      const response = await axios.post("/api/extract", formData);
+      const response = await axios.post<ApiResponse>("/api/extract", formData);
       setResult(response.data);
 
-      // 엑셀 파일 다운로드
       if (response.data.success && response.data.excel_file) {
         const { content, filename } = response.data.excel_file;
         const blob = base64ToBlob(
@@ -45,32 +82,12 @@ function App() {
       }
     } catch (error) {
       console.error("Error:", error);
-      setResult({ success: false, error: error.message });
+      setResult({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
     setLoading(false);
-  };
-
-  // base64를 Blob으로 변환하는 유틸리티 함수
-  const base64ToBlob = (base64, type = "application/octet-stream") => {
-    const binStr = atob(base64);
-    const len = binStr.length;
-    const arr = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      arr[i] = binStr.charCodeAt(i);
-    }
-    return new Blob([arr], { type });
-  };
-
-  // Blob을 파일로 다운로드하는 유틸리티 함수
-  const downloadBlob = (blob, filename) => {
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
   };
 
   return (
