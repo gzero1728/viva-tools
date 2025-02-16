@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import UploadFile
 import shutil
 import asyncio
-from utils.pdf_extractor import extract_pdf
+from ..utils.pdf_extractor import extract_pdf
 
 class PDFService:
     @staticmethod

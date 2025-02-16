@@ -2,7 +2,7 @@ import pdfplumber
 import pandas as pd
 
 from fuzzywuzzy import fuzz
-from utils.text_normalizer import normalize_text, remove_duplicated_chars
+from .text_normalizer import normalize_text, remove_duplicated_chars
 
 def extract_pdf(pdf_path: str, item_col_idx: int = 0, result_col_idx: int = 1) -> list:
     """
